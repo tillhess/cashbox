@@ -78,7 +78,7 @@ function createCashbox(name) {
 
       console.log('create cashbox ' + name);
       client
-        .query('INSERT INTO cashbox (name, secret) VALUES ("'+name+'", "hallo");')
+        .query('INSERT INTO cashbox (name, secret) VALUES ($1, $2);',[name,'hallo'])
         .on('row', function(row) {
           console.log('INSERT ROW', JSON.stringify(row));
         })
