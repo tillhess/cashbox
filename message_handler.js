@@ -78,7 +78,7 @@ function createCashbox(name) {
 
       console.log('create cashbox ' + name);
       client
-        .query('INSERT INTO information_schema.cashbox (name, secret) VALUES ("'+name+'", "hallo");')
+        .query('INSERT INTO cashbox (name, secret) VALUES ("'+name+'", "hallo");')
         .on('row', function(row) {
           console.log('INSERT ROW', JSON.stringify(row));
         })
@@ -99,7 +99,7 @@ function readCashboxes() {
       const names = [];
       console.log('reading cashboxes');
       client
-        .query('SELECT name FROM information_schema.cashbox;')
+        .query('SELECT name FROM cashbox;')
         .on('row', function(row) {
           console.log(JSON.stringify(row));
           names.push(row.name);
