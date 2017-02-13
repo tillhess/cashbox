@@ -53,6 +53,8 @@ pg.connect(DATABASE_URL, function(err, client) {
     .on('end', () => {
       if (initDb) {
         initialiseDatabase(client);
+      } else {
+        client.end();
       }
     });;
 });
@@ -85,13 +87,7 @@ const PAGE_ACCESS_TOKEN = (process.env.MESSENGER_PAGE_ACCESS_TOKEN) ?
   (process.env.MESSENGER_PAGE_ACCESS_TOKEN) :
   config.get('pageAccessToken');
 
-// URL where the app is running (include protocol). Used to point to scripts and
-// assets located at this address.
-const SERVER_URL = (process.env.SERVER_URL) ?
-  (process.env.SERVER_URL) :
-  config.get('serverURL');
-
-if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
+if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN)) {
   console.error("Missing config values");
   process.exit(1);
 }

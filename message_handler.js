@@ -4,6 +4,10 @@ sha1 = require('sha1'),
 config = require('config'),
 pg = require('pg');
 
+// Generate a page access token for your page from the App Dashboard
+const PAGE_ACCESS_TOKEN = (process.env.MESSENGER_PAGE_ACCESS_TOKEN) ?
+  (process.env.MESSENGER_PAGE_ACCESS_TOKEN) :
+  config.get('pageAccessToken');
 
 const DATABASE_URL = (process.env.DATABASE_URL) ?
   process.env.DATABASE_URL :
@@ -64,7 +68,7 @@ module.exports = function handleMessage(event) {
 
 function readCashboxes() {
   console.log('HAS PROMISE?', new Promise());
-  pg.connect(process.env.DATABASE_URL, function(err, client) {
+  pg.connect(DATABASE_URL, function(err, client) {
     if (err) throw err;
   });
 }
