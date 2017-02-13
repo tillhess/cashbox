@@ -17,6 +17,7 @@ const
   express = require('express'),
   https = require('https'),
   request = require('request'),
+  sha1 = require('sha1'),
   pg = require('pg');
 
 pg.defaults.ssl = true;
@@ -24,11 +25,27 @@ pg.connect(process.env.DATABASE_URL, function(err, client) {
   if (err) throw err;
   console.log('Connected to postgres! Getting schemas...');
 
+  let initDb = true;
+
   client
     .query('SELECT table_schema,table_name FROM information_schema.tables;')
     .on('row', function(row) {
       console.log(JSON.stringify(row));
+      if(row.table_name === 'cashbox') {
+        initDb = false;
+        console.log('Found casbox table, no init needed');
+      }
     });
+
+    if (initDb) {
+      console.log('initialising');
+      const query = client
+        .query('CREATE TABLE cashbox(id SERIAL PRIMARY KEY, name VARCHAR(40) not null, secret VARCHAR(40) not null)')
+        .on('end', () => {
+          client.end();
+          console.log('cashbox table created!');
+        });
+    }
 });
 
 
