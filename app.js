@@ -56,7 +56,7 @@ pg.connect(DATABASE_URL, function(err, client) {
       } else {
         client.end();
       }
-    });;
+    });
 });
 
 

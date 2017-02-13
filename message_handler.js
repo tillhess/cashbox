@@ -49,12 +49,17 @@ module.exports = function handleMessage(event) {
     // the text we received.
     switch (messageText) {
       case 'create':
-        sendTextMessage(senderID);
+        createCashbox('abc')
+        .then(() => {
+          sendTextMessage(senderID, 'Cashbox created!');
+        });
         break;
 
       case 'list':
-        readCashboxes();
-        sendTextMessage(senderID);
+        readCashboxes()
+        .then(function (names) {
+          sendTextMessage(senderID, names.join(','));
+        });
         break;
 
       default:
@@ -66,10 +71,45 @@ module.exports = function handleMessage(event) {
 
 }
 
+function createCashbox(name) {
+  return new Promise(function (resolve, reject) {
+    pg.connect(DATABASE_URL, function(err, client) {
+      if (err) throw err;
+
+      console.log('create cashbox ' + name);
+      client
+        .query('INSERT INTO information_schema.cashbox (name, secret) VALUES ("'+name+'", "hallo");')
+        .on('row', function(row) {
+          console.log('INSERT ROW', JSON.stringify(row));
+        })
+        .on('end', () => {
+          client.end();
+          resolve();
+        });
+    });
+
+  });
+}
+
 function readCashboxes() {
-  console.log('HAS PROMISE?', new Promise());
-  pg.connect(DATABASE_URL, function(err, client) {
-    if (err) throw err;
+  return new Promise(function (resolve, reject) {
+    pg.connect(DATABASE_URL, function(err, client) {
+      if (err) throw err;
+
+      const names = [];
+      console.log('reading cashboxes');
+      client
+        .query('SELECT name FROM information_schema.cashbox;')
+        .on('row', function(row) {
+          console.log(JSON.stringify(row));
+          names.push(row.name);
+        })
+        .on('end', () => {
+          client.end();
+          resolve(names);
+        });
+    });
+
   });
 }
 
